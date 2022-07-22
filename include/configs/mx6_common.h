@@ -128,6 +128,6 @@ defined(CONFIG_MX6DL)) && !defined(CONFIG_MX6SOLO)
 
 /* LDO Bypass */
 #ifndef CONFIG_MX6SLL
-#define CONFIG_LDO_BYPASS_CHECK
+#undef CONFIG_LDO_BYPASS_CHECK
 #endif
 #endif

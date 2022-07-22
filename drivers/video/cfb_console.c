@@ -1953,7 +1953,8 @@ static void *video_logo(void)
 	}
 #endif /* CONFIG_SPLASH_SCREEN */
 
-	logo_plot(video_fb_address, video_logo_xpos, video_logo_ypos);
+	run_command("fatload mmc 1:1 20000000 logo.bmp",0);
+	run_command("bmp display 20000000",0);
 
 #ifdef CONFIG_SPLASH_SCREEN_ALIGN
 	/*
@@ -2005,8 +2006,7 @@ static void *video_logo(void)
 				len = 0;
 			}
 		}
-	} else
-		video_drawstring(VIDEO_INFO_X, VIDEO_INFO_Y, (uchar *) info);
+	}
 
 #ifdef CONFIG_CONSOLE_EXTRA_INFO
 	{

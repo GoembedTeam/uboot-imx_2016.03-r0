@@ -44,7 +44,9 @@
 #define IMX_FEC_BASE			ENET_BASE_ADDR
 #define CONFIG_FEC_XCV_TYPE		RGMII
 #define CONFIG_ETHPRIME			"FEC"
-#define CONFIG_FEC_MXC_PHYADDR		1
+#define CONFIG_FEC_MXC_PHYADDR		4
+#define CONFIG_LIB_RAND
+#define CONFIG_NET_RANDOM_ETHADDR
 
 #define CONFIG_PHYLIB
 #define CONFIG_PHY_ATHEROS
@@ -57,6 +59,10 @@
 #else
 #define CONFIG_MFG_NAND_PARTITION ""
 #endif
+
+#define MXC_FB0          "mxcfb0=video=mxcfb0:dev=lcd,SEIKO-WVGA,if=RGB24,bpp=16,int_clk\0"
+#define MXC_FB1          "mxcfb1=video=mxcfb1:dev=hdmi,1920x1080M@60,if=RGB24,bpp=16\0"
+#define LDBMODE          "ldbmode=ldb=sin0\0"
 
 #define CONFIG_MFG_ENV_SETTINGS \
 	"mfgtool_args=setenv bootargs console=" CONFIG_CONSOLE_DEV ",115200 " \
@@ -75,7 +81,7 @@
 
 #ifdef CONFIG_SUPPORT_EMMC_BOOT
 #define EMMC_ENV \
-	"emmcdev=2\0" \
+	"emmcdev=1\0" \
 	"update_emmc_firmware=" \
 		"if test ${ip_dyn} = yes; then " \
 			"setenv get_cmd dhcp; " \
@@ -134,10 +140,13 @@
 
 #define CONFIG_EXTRA_ENV_SETTINGS \
 	CONFIG_MFG_ENV_SETTINGS \
+	MXC_FB0 \
+	MXC_FB1 \
+	LDBMODE \
 	"epdc_waveform=epdc_splash.bin\0" \
 	"script=boot.scr\0" \
 	"image=zImage\0" \
-	"fdt_file=undefined\0" \
+	"fdt_file=" CONFIG_DEFAULT_FDT_FILE "\0" \
 	"fdt_addr=0x18000000\0" \
 	"boot_fdt=try\0" \
 	"ip_dyn=yes\0" \
@@ -167,7 +176,7 @@
 		"fi\0" \
 	EMMC_ENV	  \
 	"smp=" CONFIG_SYS_NOSMP "\0"\
-	"mmcargs=setenv bootargs console=${console},${baudrate} ${smp} " \
+	"mmcargs=setenv bootargs console=${console},${baudrate} ${mxcfb0} ${mxcfb1} ${ldbmode} ${smp} " \
 		"root=${mmcroot}\0" \
 	"loadbootscript=" \
 		"fatload mmc ${mmcdev}:${mmcpart} ${loadaddr} ${script};\0" \
@@ -214,27 +223,8 @@
 		"else " \
 			"bootz; " \
 		"fi;\0" \
-		"findfdt="\
-			"if test $fdt_file = undefined; then " \
-				"if test $board_name = SABREAUTO && test $board_rev = MX6QP; then " \
-					"setenv fdt_file imx6qp-sabreauto.dtb; fi; " \
-				"if test $board_name = SABREAUTO && test $board_rev = MX6Q; then " \
-					"setenv fdt_file imx6q-sabreauto.dtb; fi; " \
-				"if test $board_name = SABREAUTO && test $board_rev = MX6DL; then " \
-					"setenv fdt_file imx6dl-sabreauto.dtb; fi; " \
-				"if test $board_name = SABRESD && test $board_rev = MX6QP; then " \
-					"setenv fdt_file imx6qp-sabresd.dtb; fi; " \
-				"if test $board_name = SABRESD && test $board_rev = MX6Q; then " \
-					"setenv fdt_file imx6q-sabresd.dtb; fi; " \
-				"if test $board_name = SABRESD && test $board_rev = MX6DL; then " \
-					"setenv fdt_file imx6dl-sabresd.dtb; fi; " \
-				"if test $fdt_file = undefined; then " \
-					"echo WARNING: Could not determine dtb to use; fi; " \
-			"fi;\0" \
-
 
 #define CONFIG_BOOTCOMMAND \
-	"run findfdt;" \
 	"mmc dev ${mmcdev};" \
 	"if mmc rescan; then " \
 		"if run loadbootscript; then " \
@@ -305,10 +295,11 @@
 #ifdef CONFIG_SYS_USE_SPINOR
 #define CONFIG_CMD_SF
 #define CONFIG_SPI_FLASH
-#define CONFIG_SPI_FLASH_STMICRO
+#define CONFIG_SPI_FLASH_SST
+#define CONFIG_SPI_FLASH_BOYA
 #define CONFIG_MXC_SPI
 #define CONFIG_SF_DEFAULT_BUS  0
-#define CONFIG_SF_DEFAULT_SPEED 20000000
+#define CONFIG_SF_DEFAULT_SPEED 25000000
 #define CONFIG_SF_DEFAULT_MODE (SPI_MODE_0)
 #endif
 
@@ -376,13 +367,13 @@
 #define CONFIG_SYS_I2C_MXC_I2C2		/* enable I2C bus 2 */
 #define CONFIG_SYS_I2C_MXC_I2C3		/* enable I2C bus 3 */
 #define CONFIG_SYS_I2C_SPEED		100000
-
+#if 0
 /* PMIC */
 #define CONFIG_POWER
 #define CONFIG_POWER_I2C
 #define CONFIG_POWER_PFUZE100
 #define CONFIG_POWER_PFUZE100_I2C_ADDR	0x08
-
+#endif
 /* Framebuffer */
 #define CONFIG_VIDEO
 #define CONFIG_VIDEO_IPUV3

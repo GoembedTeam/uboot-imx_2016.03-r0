@@ -129,6 +129,9 @@ const struct spi_flash_params spi_flash_params_table[] = {
 	{"W25Q64DW",	   0xef6017, 0x0,	64 * 1024,   128, RD_FULL,	    WR_QPP | SECT_4K},
 	{"W25Q128FW",	   0xef6018, 0x0,	64 * 1024,   256, RD_FULL,	    WR_QPP | SECT_4K},
 #endif
+#ifdef CONFIG_SPI_FLASH_BOYA         /* BOYA */
+	{"BY25D16AS",      0x684015, 0x0,       64 * 1024,    32, RD_NORM,                         0},
+#endif
 	{},	/* Empty entry to terminate the list */
 	/*
 	 * Note:

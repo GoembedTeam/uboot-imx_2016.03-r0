@@ -12,6 +12,9 @@ int board_video_skip(void)
 {
 	int i;
 	int ret;
+	if (!getenv("panel"))
+		setenv("panel", "SEIKO-WVGA");
+	setenv("splashpos", "m,m");
 	char const *panel = getenv("panel");
 
 	if (!panel) {

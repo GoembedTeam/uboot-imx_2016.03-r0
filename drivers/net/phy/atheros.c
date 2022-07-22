@@ -38,6 +38,29 @@ static int ar8035_config(struct phy_device *phydev)
 
 	return 0;
 }
+static int yt8511_config(struct phy_device *phydev)
+{
+	/* Close broadcast address 0x0 */
+	phy_write(phydev, MDIO_DEVAD_NONE, 0xd, 0x7);
+	phy_write(phydev, MDIO_DEVAD_NONE, 0xe, 0x8001);
+	phy_write(phydev, MDIO_DEVAD_NONE, 0xd, 0x4007);
+	phy_write(phydev, MDIO_DEVAD_NONE, 0xe, 0x3f);
+
+	/* Turn off sleep mode, sleep mode does not output 125MHz clk */
+	phy_write(phydev, MDIO_DEVAD_NONE, 0x1e, 0x27);
+	phy_write(phydev, MDIO_DEVAD_NONE, 0x1f, 0x2027);
+
+	/* Output 125MHz clk */
+	phy_write(phydev, MDIO_DEVAD_NONE, 0x1e, 0x0c);
+	phy_write(phydev, MDIO_DEVAD_NONE, 0x1f, 0x8057);
+
+	phydev->supported = phydev->drv->features;
+
+	genphy_config_aneg(phydev);
+	genphy_restart_aneg(phydev);
+
+	return 0;
+}
 
 static struct phy_driver AR8021_driver =  {
 	.name = "AR8021",
@@ -69,11 +92,22 @@ static struct phy_driver AR8035_driver =  {
 	.shutdown = genphy_shutdown,
 };
 
+static struct phy_driver YT8511_driver =  {
+	.name = "YT8511",
+	.uid = 0x0000010a,
+	.mask = 0x00000fff,
+	.features = PHY_GBIT_FEATURES,
+	.config = yt8511_config,
+	.startup = genphy_startup,
+	.shutdown = genphy_shutdown,
+};
+
 int phy_atheros_init(void)
 {
 	phy_register(&AR8021_driver);
 	phy_register(&AR8031_driver);
 	phy_register(&AR8035_driver);
+	phy_register(&YT8511_driver);
 
 	return 0;
 }
